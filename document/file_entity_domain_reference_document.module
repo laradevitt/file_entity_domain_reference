@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Code for the File Entity Domain Reference (Image) module.
+ */
+
+/**
+ * Implements hook_field_attach_presave().
+ */
+function file_entity_domain_reference_document_field_attach_presave($entity_type, $entity) {
+  file_entity_domain_reference_field_attach_presave_helper('document', $entity_type, $entity);
+}

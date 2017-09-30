@@ -1,0 +1,10 @@
+name = File entity domain reference
+core = 7.x
+package = Features
+dependencies[] = domain
+dependencies[] = domain_views
+dependencies[] = features
+dependencies[] = file_entity
+dependencies[] = options
+features[features_api][] = api:2
+features[field_base][] = field_file_domain

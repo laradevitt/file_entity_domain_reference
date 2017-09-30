@@ -1,0 +1,91 @@
+<?php
+/**
+ * @file
+ * Code for the File Entity Domain Reference module.
+ */
+
+/**
+ * Called by submodule implementations of hook_field_attach_presave().
+ *
+ * We've added a field to image file type to keep track of the domain from
+ * which the image is uploaded. Here we check if the value has already been set
+ * and, if it hasn't, set it to the current domain.
+ */
+function file_entity_domain_reference_field_attach_presave_helper($bundle, $entity_type, &$entity) {
+  $field_name = 'field_file_domain';
+  if ($entity_type == 'file' && $entity->type == $bundle) {
+    if (isset($entity->{$field_name}[LANGUAGE_NONE])) {
+      if (empty($entity->{$field_name}[LANGUAGE_NONE])) {
+        $_domain = domain_get_domain();
+        $entity->{$field_name}[LANGUAGE_NONE][] = array('domain' => $_domain['machine_name']);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ *
+ * Turn the string filter into one that provides a select list of domains.
+ */
+function file_entity_domain_reference_views_data_alter(&$data) {
+  $field_name = 'field_file_domain';
+  if (isset($data['field_data_' . $field_name])) {
+    $data['field_data_' . $field_name]['table']['group'] = t('Domain assignment');
+    $data['field_data_' . $field_name][$field_name . '_domain']['filter']['handler'] = 'domain_views_handler_filter_domain_machine_name';
+  }
+}
+
+/**
+ * Helper function.
+ */
+function file_entity_domain_reference_update_file_entities(&$sandbox, $row) {
+
+  if (isset($row->uid)) {
+
+    $domain_machine_name = '';
+
+    // Look up info on the domain the user is assigned to (return only first
+    // match).
+    $query = db_select('domain_editor', 'de');
+    $query->join('domain', 'd', 'de.domain_id = d.domain_id');
+    $query->fields('d', array());
+    $query->range(0, 1);
+    $query->condition('de.uid', $row->uid);
+    $result = $query->execute();
+    $domain = $result->fetchObject();
+
+    if (!empty($domain)) {
+      $domain_machine_name = $domain->machine_name;
+    }
+
+    if ($domain_machine_name) {
+      // Populate field for this file entity.
+      // db_insert('field_data_field_file_' . $row->type . '_domain')
+      //   ->fields(array(
+      //     'entity_type' => 'file',
+      //     'bundle' => $row->type,
+      //     'deleted' => 0,
+      //     'entity_id' => $row->fid,
+      //     'revision_id' => $row->fid,
+      //     'language' => LANGUAGE_NONE,
+      //     'delta' => 0,
+      //     'field_file_' . $row->type . '_domain_domain ' => $domain_machine_name,
+      //   ))
+      //   ->execute();
+      db_insert('field_data_field_file_domain')
+        ->fields(array(
+          'entity_type' => 'file',
+          'bundle' => $row->type,
+          'deleted' => 0,
+          'entity_id' => $row->fid,
+          'revision_id' => $row->fid,
+          'language' => LANGUAGE_NONE,
+          'delta' => 0,
+          'field_file_domain_domain ' => $domain_machine_name,
+        ))
+        ->execute();
+      $sandbox['inserted']++;
+    }
+  }
+}
