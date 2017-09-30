@@ -61,18 +61,6 @@ function file_entity_domain_reference_update_file_entities(&$sandbox, $row) {
 
     if ($domain_machine_name) {
       // Populate field for this file entity.
-      // db_insert('field_data_field_file_' . $row->type . '_domain')
-      //   ->fields(array(
-      //     'entity_type' => 'file',
-      //     'bundle' => $row->type,
-      //     'deleted' => 0,
-      //     'entity_id' => $row->fid,
-      //     'revision_id' => $row->fid,
-      //     'language' => LANGUAGE_NONE,
-      //     'delta' => 0,
-      //     'field_file_' . $row->type . '_domain_domain ' => $domain_machine_name,
-      //   ))
-      //   ->execute();
       db_insert('field_data_field_file_domain')
         ->fields(array(
           'entity_type' => 'file',
