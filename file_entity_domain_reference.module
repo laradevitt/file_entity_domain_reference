@@ -37,6 +37,21 @@ function file_entity_domain_reference_views_data_alter(&$data) {
 }
 
 /**
+ * Implements hook_form_alter().
+ *
+ * If a form contains our field and it has no value, set it to the current
+ * domain.
+ */
+function file_entity_domain_reference_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['field_file_domain'])) {
+    if (empty($form['field_file_domain'][LANGUAGE_NONE]['#default_value'])) {
+      $domain = domain_get_domain();
+      $form['field_file_domain'][LANGUAGE_NONE]['#default_value'] = array($domain['machine_name']);
+    }
+  }
+}
+
+/**
  * Helper function.
  */
 function file_entity_domain_reference_update_file_entities(&$sandbox, $row) {

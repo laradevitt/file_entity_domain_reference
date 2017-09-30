@@ -18,10 +18,11 @@ Important
 
 What it does
 ------------
-The parent module does little on its own beyond providing a base field definition; a submodule is provided for each file entity bundle (currently 'image' and 'document'). Enabling one of these submodules will:
+The parent module provides a base field definition; a submodule must be enabled in order to make use of it. There is one provided for each file entity bundle (currently 'image' and 'document'). Enabling a submodule will:
 * Add a 'Domain reference'-type field instance to the bundle.
 * Provide an update function that populates the field for all existing file entities from the bundle. It uses Batch API so should be able to handle a large volume.
 * Automatically populate the field when a new entity is saved (unless it is manually set).
+* On edit forms, automatically set the default value of the field to the current domain.
 * Replace the default views filter handler on the field (string) to one provided by domain_views which returns domain names keyed by machine name.
 
 What you can do
